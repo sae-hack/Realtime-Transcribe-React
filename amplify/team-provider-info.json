@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-realtimetranscribe-dev-133824-authRole",
+      "UnauthRoleArn": "arn:aws:iam::718037903825:role/amplify-realtimetranscribe-dev-133824-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::718037903825:role/amplify-realtimetranscribe-dev-133824-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-realtimetranscribe-dev-133824-deployment",
+      "UnauthRoleName": "amplify-realtimetranscribe-dev-133824-unauthRole",
+      "StackName": "amplify-realtimetranscribe-dev-133824",
+      "StackId": "arn:aws:cloudformation:us-east-2:718037903825:stack/amplify-realtimetranscribe-dev-133824/cdcf0780-cee2-11eb-bff3-06211fe87d0c",
+      "AmplifyAppId": "d3emsl2d0gydgd"
+    }
+  }
+}
