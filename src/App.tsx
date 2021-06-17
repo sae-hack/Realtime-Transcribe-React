@@ -6,6 +6,9 @@ import { Container, Col, Row } from "react-bootstrap";
 import BottomBar from "./BottomBar";
 import UserContext from "./UserContext";
 import { CognitoUser } from "amazon-cognito-identity-js";
+import { useTranscribe } from "./hooks";
+
+const region = "us-west-2";
 
 const App: React.FC = () => {
   const [user, setUser] = useState<CognitoUser | undefined>(undefined);
@@ -20,6 +23,9 @@ const App: React.FC = () => {
     });
   }, []);
 
+  const [credential, setCredential] = useState<any>();
+  const { transcription, partial, error } = useTranscribe(credential, region);
+
   return (
     <AmplifyAuthenticator>
       {user && (
@@ -27,11 +33,18 @@ const App: React.FC = () => {
           <div>
             <Container>
               <Row>
-                <Col></Col>
+                <Col>
+                  {transcription.map((dialog, i) => (
+                    <p key={i}>
+                      <i>{dialog.startTime}</i>{" "}
+                      <strong>{dialog.speaker}</strong> {dialog.words.join(" ")}
+                    </p>
+                  ))}
+                </Col>
               </Row>
             </Container>
           </div>
-          <BottomBar />
+          <BottomBar setCredential={setCredential} />
         </UserContext.Provider>
       )}
     </AmplifyAuthenticator>

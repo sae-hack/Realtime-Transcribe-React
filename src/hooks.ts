@@ -16,11 +16,18 @@ type CognitoUserTweaked = CognitoUser & {
   };
 };
 
+interface Dialog {
+  startTime: number;
+  endTime: number;
+  speaker: number;
+  words: string[];
+}
+
 export const useUser = (): CognitoUserTweaked | undefined =>
   useContext(UserContext);
 
 export const useTranscribe = (credential: any, region: string) => {
-  const [transcription, setTranscription] = useState<string>("");
+  const [transcription, setTranscription] = useState<Dialog[]>([]);
   const [partial, setPartial] = useState<string>("");
   const [error, setError] = useState<string>();
 
@@ -38,7 +45,38 @@ export const useTranscribe = (credential: any, region: string) => {
           setPartial(transcript);
         } else {
           setPartial("");
-          setTranscription((t) => t + transcript + "\n");
+          setTranscription((t: Dialog[]) => {
+            const dialogsToAppend: Dialog[] = [];
+            for (const item of results[0].Alternatives[0].Items) {
+              const speaker = item.Speaker;
+              const text = item.Content;
+              const type = item.Type;
+              const startTime = item.StartTime;
+              const endTime = item.EndTime;
+
+              const lastDialog =
+                dialogsToAppend.length > 0
+                  ? dialogsToAppend[dialogsToAppend.length - 1]
+                  : undefined;
+
+              if (!lastDialog || type === "speaker-change") {
+                dialogsToAppend.push({
+                  speaker,
+                  words: [text],
+                  startTime,
+                  endTime,
+                });
+              } else {
+                dialogsToAppend.pop();
+                dialogsToAppend.push({
+                  ...lastDialog,
+                  words: [...lastDialog.words, text],
+                  endTime,
+                });
+              }
+            }
+            return [...t, ...dialogsToAppend];
+          });
         }
       }
     }

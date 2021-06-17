@@ -19,7 +19,6 @@ const UserControls: React.FC = () => {
 
   if (!user) return null;
 
-  console.log(user);
   return (
     <Styles>
       <span>{user?.attributes?.email}</span>

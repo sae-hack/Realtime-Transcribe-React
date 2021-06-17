@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import RecordControl from "./RecordControl";
+import RecordControl, { RecordControlProps } from "./RecordControl";
 import UserControls from "./UserControls";
 
 const Styles = styled.div`
@@ -13,11 +13,11 @@ const Styles = styled.div`
   color: white;
 `;
 
-const BottomBar: React.FC = () => {
+const BottomBar: React.FC<RecordControlProps> = (props) => {
   return (
     <Styles>
       <UserControls />
-      <RecordControl />
+      <RecordControl {...props} />
     </Styles>
   );
 };
