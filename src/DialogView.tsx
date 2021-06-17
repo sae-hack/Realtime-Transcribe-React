@@ -122,6 +122,7 @@ const DialogView: React.FC<Props> = ({
       <div
         className="content"
         style={{ backgroundColor: _color.lighten(0.2).hex() }}
+        contentEditable={true}
       >
         {dialog ? dialog.words : partial}
       </div>

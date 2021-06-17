@@ -172,6 +172,10 @@ const App: React.FC = () => {
     },
     [allSpeakers, setTranscription, speakers, unallocatedSpeakerNames]
   );
+  
+  // let updateDialog = (dialogId: string, dialog: Dialog) => {
+    
+  // }
 
   return (
     <AmplifyAuthenticator>
