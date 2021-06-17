@@ -29,7 +29,7 @@ const RecordControl: React.FC<RecordControlProps> = ({ setCredential }) => {
         })
         .catch(() => setLoading(false));
     }
-  }, [user]);
+  }, [user, setCredential]);
 
   return (
     <Styles>

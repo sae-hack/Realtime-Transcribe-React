@@ -7,6 +7,7 @@ import BottomBar from "./BottomBar";
 import UserContext from "./UserContext";
 import { CognitoUser } from "amazon-cognito-identity-js";
 import { useTranscribe } from "./hooks";
+import DialogView from "./DialogView";
 
 const region = "us-west-2";
 
@@ -35,10 +36,7 @@ const App: React.FC = () => {
               <Row>
                 <Col>
                   {transcription.map((dialog, i) => (
-                    <p key={i}>
-                      <i>{dialog.startTime}</i>{" "}
-                      <strong>{dialog.speaker}</strong> {dialog.words.join(" ")}
-                    </p>
+                    <DialogView key={i} {...dialog} />
                   ))}
                 </Col>
               </Row>
