@@ -1,8 +1,3 @@
-export interface Speaker {
-  id: number;
-  name: string;
-}
-
 export interface Dialog {
   startTime: number;
   endTime: number;
@@ -13,5 +8,5 @@ export interface Dialog {
 export interface SaveToQuipRequest {
   documentId: string;
   dialogs: Dialog[];
-  speakers: Speaker[];
+  speakers: Record<number, string>;
 }

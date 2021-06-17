@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import UserContext from "./UserContext";
+import { UserContext } from "./contexts";
 import { CognitoUser } from "amazon-cognito-identity-js";
 import { Dialog } from "./types";
 // import MicrophoneStream from "microphone-stream";
