@@ -10,6 +10,7 @@ const Styles = styled.div`
   bottom: 0;
   background-color: orange;
   justify-content: space-between;
+  color: white;
 `;
 
 const BottomBar: React.FC = () => {
