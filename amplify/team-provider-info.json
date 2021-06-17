@@ -10,6 +10,11 @@
       "StackName": "amplify-realtimetranscribe-dev-133824",
       "StackId": "arn:aws:cloudformation:us-east-2:718037903825:stack/amplify-realtimetranscribe-dev-133824/cdcf0780-cee2-11eb-bff3-06211fe87d0c",
       "AmplifyAppId": "d3emsl2d0gydgd"
+    },
+    "categories": {
+      "auth": {
+        "realtimetranscribe0e3a107d": {}
+      }
     }
   }
 }

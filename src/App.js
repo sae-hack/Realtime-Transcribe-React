@@ -1,25 +1,26 @@
 import logo from './logo.svg';
 import './App.css';
+import { API, Auth } from "aws-amplify";
+import React, { useEffect } from 'react';
+import { AmplifyAuthenticator, AmplifySignOut } from "@aws-amplify/ui-react";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+const App = () => {
+  useEffect(() => {
+
+    Auth.currentSession().then(session => {
+      const jwtToken = session.getIdToken().getJwtToken();
+      console.log('jwtToken', jwtToken);
+
+      API.get('SAMAPI', '/start-session', { headers: { "Authorization": "Bearer " + jwtToken } }).then((data) => console.log(data)).catch((error) => console.log(error))
+    })
+  }, [])
+
+  return <AmplifyAuthenticator>
+    <div>
+      My App
+      <AmplifySignOut />
     </div>
-  );
-}
+  </AmplifyAuthenticator>
+};
 
 export default App;
