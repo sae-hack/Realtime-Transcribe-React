@@ -1,28 +1,39 @@
 import "./App.css";
-import { API, Auth } from "aws-amplify";
-import React, { useEffect } from "react";
-import { AmplifyAuthenticator, AmplifySignOut } from "@aws-amplify/ui-react";
+import React, { useEffect, useState } from "react";
+import { AmplifyAuthenticator } from "@aws-amplify/ui-react";
+import { AuthState, onAuthUIStateChange } from "@aws-amplify/ui-components";
+import { Container, Col, Row } from "react-bootstrap";
+import BottomBar from "./BottomBar";
+import UserContext from "./UserContext";
+import { CognitoUser } from "amazon-cognito-identity-js";
 
 const App: React.FC = () => {
-  useEffect(() => {
-    Auth.currentSession().then((session) => {
-      const jwtToken = session.getIdToken().getJwtToken();
-      console.log("jwtToken", jwtToken);
+  const [user, setUser] = useState<CognitoUser | undefined>(undefined);
 
-      API.get("SAMAPI", "/start-session", {
-        headers: { Authorization: "Bearer " + jwtToken },
-      })
-        .then((data) => console.log(data))
-        .catch((error) => console.log(error));
+  useEffect(() => {
+    return onAuthUIStateChange((nextAuthState, authData) => {
+      if (nextAuthState === AuthState.SignedIn) {
+        setUser(authData as CognitoUser);
+      } else {
+        setUser(undefined);
+      }
     });
   }, []);
 
   return (
     <AmplifyAuthenticator>
-      <div>
-        My App
-        <AmplifySignOut />
-      </div>
+      {user && (
+        <UserContext.Provider value={user}>
+          <div>
+            <Container>
+              <Row>
+                <Col></Col>
+              </Row>
+            </Container>
+          </div>
+          <BottomBar />
+        </UserContext.Provider>
+      )}
     </AmplifyAuthenticator>
   );
 };
