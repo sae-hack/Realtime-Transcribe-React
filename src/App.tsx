@@ -13,6 +13,18 @@ import distinctColors from "distinct-colors";
 import SpeakerList from "./SpeakerList";
 import { Dialog } from "./types";
 
+const customSpeakerIds: number[] = [];
+const generateNewSpeakerId = (): number => {
+  if (customSpeakerIds.length === 0) {
+    customSpeakerIds.push(10000);
+    return 10000;
+  } else {
+    const newId = customSpeakerIds[customSpeakerIds.length - 1] + 1;
+    customSpeakerIds.push(newId);
+    return newId;
+  }
+};
+
 const region = "us-west-2";
 
 const DEFAULT_SPEAKER_COUNT = 6; // if there are more speakers, we recreate the colors object
@@ -35,7 +47,10 @@ const App: React.FC = () => {
   }, []);
 
   const [credential, setCredential] = useState<any>();
-  const { transcription, partial, error } = useTranscribe(credential, region);
+  const { transcription, setTranscription, partial, error } = useTranscribe(
+    credential,
+    region
+  );
   const [speakers, setSpeakers] = useState<Record<number, string>>({});
 
   const [unallocatedSpeakerNames, allocateSpeakerNames] = useState<string[]>(
@@ -113,7 +128,7 @@ const App: React.FC = () => {
         allocateSpeakerNames((s) => [...s, name]);
       }
     },
-    [speakers, unallocatedSpeakerNames, allSpeakers]
+    [unallocatedSpeakerNames, allSpeakers]
   );
 
   const speakerOptions = useMemo(
@@ -121,9 +136,42 @@ const App: React.FC = () => {
     [allSpeakers, unallocatedSpeakerNames]
   );
 
-  const handleSetSpeaker = useCallback((dialog: Dialog, name: string) => {
-    console.log(dialog, name);
-  }, []);
+  const handleSetSpeaker = useCallback(
+    (dialog: Dialog, name: string) => {
+      // set to unallocated speaker
+      let newId: number;
+      if (unallocatedSpeakerNames.includes(name)) {
+        newId = generateNewSpeakerId();
+      } else {
+        // find old speaker id
+        let speakerId = null;
+        for (const id in speakers) {
+          if (speakers[id] === name) {
+            speakerId = id;
+            break;
+          }
+        }
+
+        if (speakerId === null && allSpeakers.includes(name)) {
+          // it is a speaker number
+          speakerId = parseInt(name);
+        } else {
+          console.error("Cannot find speaker with existing name ", name);
+        }
+        newId = speakerId as unknown as number;
+      }
+      setSpeakers((s) => ({ ...s, [newId]: name }));
+      setTranscription((t: Dialog[]) => {
+        const indexToReplace = t.indexOf(dialog);
+        return [
+          ...t.slice(0, indexToReplace),
+          { ...dialog, speaker: newId },
+          ...t.slice(indexToReplace),
+        ];
+      });
+    },
+    [allSpeakers, setTranscription, speakers, unallocatedSpeakerNames]
+  );
 
   return (
     <AmplifyAuthenticator>

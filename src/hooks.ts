@@ -92,6 +92,7 @@ export const useTranscribe = (credential: any, region: string) => {
 
   return {
     transcription,
+    setTranscription,
     partial,
     error,
   };
