@@ -1,10 +1,9 @@
-import logo from "./logo.svg";
 import "./App.css";
 import { API, Auth } from "aws-amplify";
 import React, { useEffect } from "react";
 import { AmplifyAuthenticator, AmplifySignOut } from "@aws-amplify/ui-react";
 
-const App = () => {
+const App: React.FC = () => {
   useEffect(() => {
     Auth.currentSession().then((session) => {
       const jwtToken = session.getIdToken().getJwtToken();
