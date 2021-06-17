@@ -12,6 +12,7 @@ import DialogView from "./DialogView";
 import distinctColors from "distinct-colors";
 import SpeakerList from "./SpeakerList";
 import { Dialog } from "./types";
+import { makeMarkdown, makePostRequest } from "./utils";
 
 const customSpeakerIds: number[] = [];
 const generateNewSpeakerId = (): number => {
@@ -172,10 +173,22 @@ const App: React.FC = () => {
     },
     [allSpeakers, setTranscription, speakers, unallocatedSpeakerNames]
   );
-  
-  // let updateDialog = (dialogId: string, dialog: Dialog) => {
-    
-  // }
+
+  const handleSaveToQuip = useCallback(
+    (documentUrl: string) => {
+      const markdown = makeMarkdown(transcription, speakers);
+
+      makePostRequest("/putDocument", {
+        content: markdown,
+        documentUrl,
+      })
+        .then(() => {
+          window.open(documentUrl);
+        })
+        .catch((error) => alert(error));
+    },
+    [transcription, speakers]
+  );
 
   return (
     <AmplifyAuthenticator>
@@ -221,7 +234,10 @@ const App: React.FC = () => {
               </Row>
             </Container>
           </div>
-          <BottomBar setCredential={setCredential} />
+          <BottomBar
+            setCredential={setCredential}
+            saveToQuip={handleSaveToQuip}
+          />
         </UserContext.Provider>
       )}
     </AmplifyAuthenticator>

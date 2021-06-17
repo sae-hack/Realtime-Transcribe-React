@@ -13,9 +13,13 @@ const Styles = styled.div`
 
 export interface RecordControlProps {
   setCredential: (credential: any) => void;
+  saveToQuip: (documentUrl: string) => void;
 }
 
-const RecordControl: React.FC<RecordControlProps> = ({ setCredential }) => {
+const RecordControl: React.FC<RecordControlProps> = ({
+  setCredential,
+  saveToQuip,
+}) => {
   const user = useUser();
   const [loading, setLoading] = useState(false);
 
@@ -31,9 +35,19 @@ const RecordControl: React.FC<RecordControlProps> = ({ setCredential }) => {
     }
   }, [user, setCredential]);
 
+  const handleSaveToQuip = useCallback(() => {
+    const url = prompt("Quip document URL:");
+    if (url) {
+      saveToQuip(url);
+    }
+  }, [saveToQuip]);
+
   return (
     <Styles>
       {loading && <ClipLoader color="white" size={20} />}
+      <AmplifyButton disabled={!user} onClick={handleSaveToQuip}>
+        Save to Quip
+      </AmplifyButton>
       <AmplifyButton disabled={!user} onClick={handleStartSession}>
         Start
       </AmplifyButton>
