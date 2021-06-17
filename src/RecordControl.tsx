@@ -2,7 +2,7 @@ import { AmplifyButton } from "@aws-amplify/ui-react";
 import React, { useCallback, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
-import { useUser } from "./hooks";
+import { useUser, useTranscribe } from "./hooks";
 import { makeRequest } from "./utils";
 
 const Styles = styled.div`
@@ -11,21 +11,27 @@ const Styles = styled.div`
   align-items: center;
 `;
 
+const region = "us-west-2";
+
 const RecordControl: React.FC = () => {
   const user = useUser();
   const [loading, setLoading] = useState(false);
+  const [credential, setCredential] = useState<any>();
 
   const handleStartSession = useCallback(() => {
     if (user) {
       setLoading(true);
       makeRequest("/start-session")
-        .then((data) => {
-          console.log(data);
+        .then((data: any) => {
+          setCredential(data.credentials);
           setLoading(false);
         })
         .catch(() => setLoading(false));
     }
   }, [user]);
+
+  const { transcription, partial, error } = useTranscribe(credential, region);
+  console.log("data", transcription, partial, error);
 
   return (
     <Styles>
