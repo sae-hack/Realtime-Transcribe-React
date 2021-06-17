@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import UserContext from "./UserContext";
 import { CognitoUser } from "amazon-cognito-identity-js";
+import { Dialog } from "./types";
 // import MicrophoneStream from "microphone-stream";
 // import {
 //   convertAudioToBinaryMessage,
@@ -15,24 +16,6 @@ type CognitoUserTweaked = CognitoUser & {
     email_verified: boolean;
   };
 };
-
-export interface Speaker {
-  id: number;
-  name: string;
-}
-
-export interface Dialog {
-  startTime: number;
-  endTime: number;
-  speaker: number;
-  words: string[];
-}
-
-export interface SaveToQuipRequest {
-  documentId: string;
-  dialogs: Dialog[];
-  speakers: Speaker[];
-}
 
 export const useUser = (): CognitoUserTweaked | undefined =>
   useContext(UserContext);
@@ -73,7 +56,7 @@ export const useTranscribe = (credential: any, region: string) => {
               if (!lastDialog || type === "speaker-change") {
                 dialogsToAppend.push({
                   speaker,
-                  words: [text],
+                  words: text,
                   startTime,
                   endTime,
                 });
@@ -81,7 +64,10 @@ export const useTranscribe = (credential: any, region: string) => {
                 dialogsToAppend.pop();
                 dialogsToAppend.push({
                   ...lastDialog,
-                  words: [...lastDialog.words, text],
+                  words:
+                    lastDialog.words +
+                    (type === "pronunciation" ? " " : "") +
+                    text,
                   endTime,
                 });
               }

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { BeatLoader } from "react-spinners";
 import styled from "styled-components";
-import { Dialog } from "./hooks";
+import { Dialog } from "./types";
 
 const Styles = styled.div`
   display: flex;
@@ -71,7 +71,7 @@ const DialogView: React.FC<Props> = ({ dialog, partial }) => (
         </div>
       )}
     </div>
-    <div className="content">{dialog ? dialog.words.join(" ") : partial}</div>
+    <div className="content">{dialog ? dialog.words : partial}</div>
   </Styles>
 );
 
