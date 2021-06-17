@@ -16,7 +16,8 @@ const Styles = styled.div`
 
   .meta {
     flex-shrink: 0;
-    width: 5rem;
+    width: 120px;
+    padding: 5px;
     position: relative;
     text-align: center;
     min-height: 50px;
@@ -30,7 +31,7 @@ const Styles = styled.div`
     }
 
     .speaker {
-      width: 80px;
+      width: 120px;
       height: 80px;
 
       .speaker-icon {
@@ -40,6 +41,13 @@ const Styles = styled.div`
       .speaker-label {
         font-weight: bold;
         cursor: pointer;
+
+        .btn {
+          /* erase the styles brought by react-bootstrap */
+          background-color: unset !important;
+          border: unset !important;
+          color: black;
+        }
       }
     }
   }
