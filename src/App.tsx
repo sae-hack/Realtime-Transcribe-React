@@ -166,7 +166,7 @@ const App: React.FC = () => {
         return [
           ...t.slice(0, indexToReplace),
           { ...dialog, speaker: newId },
-          ...t.slice(indexToReplace),
+          ...t.slice(indexToReplace + 1),
         ];
       });
     },
