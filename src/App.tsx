@@ -1,3 +1,4 @@
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import { AmplifyAuthenticator } from "@aws-amplify/ui-react";
@@ -32,12 +33,13 @@ const App: React.FC = () => {
       {user && (
         <UserContext.Provider value={user}>
           <div>
-            <Container>
+            <Container style={{ marginBottom: "5rem" }}>
               <Row>
                 <Col>
                   {transcription.map((dialog, i) => (
-                    <DialogView key={i} {...dialog} />
+                    <DialogView key={i} dialog={dialog} />
                   ))}
+                  {partial && <DialogView partial={partial} />}
                 </Col>
               </Row>
             </Container>
