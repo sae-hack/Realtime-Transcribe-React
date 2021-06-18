@@ -13,15 +13,17 @@ const Styles = styled.div`
 
 export interface RecordControlProps {
   setCredential: (credential: any) => void;
+  setStop: (stop: any) => void;
 }
 
-const RecordControl: React.FC<RecordControlProps> = ({ setCredential }) => {
+const RecordControl: React.FC<RecordControlProps> = ({ setCredential, setStop }) => {
   const user = useUser();
   const [loading, setLoading] = useState(false);
 
   const handleStartSession = useCallback(() => {
     if (user) {
       setLoading(true);
+      setStop(false);
       makeRequest("/start-session")
         .then((data: any) => {
           setCredential(data.credentials);
@@ -31,11 +33,20 @@ const RecordControl: React.FC<RecordControlProps> = ({ setCredential }) => {
     }
   }, [user, setCredential]);
 
+  const handleStopSession = useCallback(() => {
+    if (user) {
+      setStop(true);
+    }
+  }, [user, setStop]);
+
   return (
     <Styles>
       {loading && <ClipLoader color="white" size={20} />}
       <AmplifyButton disabled={!user} onClick={handleStartSession}>
         Start
+      </AmplifyButton>
+      <AmplifyButton disabled={!user} onClick={handleStopSession}>
+        Stop
       </AmplifyButton>
     </Styles>
   );

@@ -20,7 +20,7 @@ type CognitoUserTweaked = CognitoUser & {
 export const useUser = (): CognitoUserTweaked | undefined =>
   useContext(UserContext);
 
-export const useTranscribe = (credential: any, region: string) => {
+export const useTranscribe = (credential: any, region: string, stop: any) => {
   const [transcription, setTranscription] = useState<Dialog[]>([]);
   const [partial, setPartial] = useState<string>("");
   const [error, setError] = useState<string>();
@@ -80,7 +80,7 @@ export const useTranscribe = (credential: any, region: string) => {
   }, []);
 
   useEffect(() => {
-    if (credential && region) {
+    if (credential && region && !stop) {
       (window as any).handleEventStreamMessage = handleEventStreamMessage;
       (window as any).region = region;
       (window as any).access_id = credential.AccessKeyId;
@@ -88,7 +88,11 @@ export const useTranscribe = (credential: any, region: string) => {
       (window as any).session_token = credential.SessionToken;
       (window as any).startTranscribe();
     }
-  }, [credential, region, handleEventStreamMessage]);
+    else if (stop){
+      (window as any).closeSocket();
+      console.log("stop button clicked");
+    }
+  }, [credential, region, handleEventStreamMessage, stop]);
 
   return {
     transcription,

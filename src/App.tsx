@@ -26,7 +26,8 @@ const App: React.FC = () => {
   }, []);
 
   const [credential, setCredential] = useState<any>();
-  const { transcription, partial, error } = useTranscribe(credential, region);
+  const [stop, setStop] = useState<any>();
+  const { transcription, partial, error } = useTranscribe(credential, region, stop);
 
   return (
     <AmplifyAuthenticator>
@@ -44,7 +45,7 @@ const App: React.FC = () => {
               </Row>
             </Container>
           </div>
-          <BottomBar setCredential={setCredential} />
+          <BottomBar setCredential={setCredential} setStop={setStop} />
         </UserContext.Provider>
       )}
     </AmplifyAuthenticator>
