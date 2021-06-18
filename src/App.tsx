@@ -189,6 +189,24 @@ const App: React.FC = () => {
     },
     [transcription, speakers]
   );
+  const updateDialog = useCallback((dialogId: string, content: string) => {
+    console.log(`Changing content to ${content}, dialogId: ${dialogId}`);
+    setTranscription((t: Dialog[]) => {
+      const updated: Dialog[] = [];
+      for (const d of t) {
+        if (d.dialogId !== dialogId) {
+          updated.push(d);
+          continue;
+        }
+        const nd = {
+          ...d,
+          words: content,
+        };
+        updated.push(nd);
+      }
+      return updated;
+    });
+  }, [setTranscription]);
 
   return (
     <AmplifyAuthenticator>
@@ -212,6 +230,7 @@ const App: React.FC = () => {
                         }
                         speakerOptions={speakerOptions}
                         onSetSpeaker={handleSetSpeaker}
+                        updateDialog={updateDialog}
                       />
                     ))}
                     {partial && (

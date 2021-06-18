@@ -6,7 +6,8 @@ import styled from "styled-components";
 import { SpeakersContext } from "./contexts";
 import { Dialog } from "./types";
 import Color from "color";
-import { Dropdown } from "react-bootstrap";
+import { Dropdown, Form } from "react-bootstrap";
+import { propTypes } from "react-bootstrap/esm/Image";
 
 const Styles = styled.div`
   display: flex;
@@ -64,6 +65,7 @@ interface Props {
   color?: string;
   speakerOptions: string[];
   onSetSpeaker: (dialog: Dialog, name: string) => void;
+  updateDialog?: (diaglogId: string, dialog: string) => void;
 }
 
 const DialogView: React.FC<Props> = ({
@@ -72,6 +74,7 @@ const DialogView: React.FC<Props> = ({
   color = "#fff",
   speakerOptions,
   onSetSpeaker,
+  updateDialog
 }) => {
   const { speakers, setSpeakers } = useContext(SpeakersContext);
   const [editing, setEditing] = useState(false);
@@ -119,13 +122,11 @@ const DialogView: React.FC<Props> = ({
           </div>
         )}
       </div>
-      <div
-        className="content"
-        style={{ backgroundColor: _color.lighten(0.2).hex() }}
-        contentEditable={true}
-      >
-        {dialog ? dialog.words : partial}
-      </div>
+      <Form.Control value={dialog ? dialog.words : partial} onChange={(e) => {
+        if(updateDialog && dialog) {
+          updateDialog(dialog.dialogId, e.target.value);
+        }
+      }} />
     </Styles>
   );
 };
