@@ -194,7 +194,6 @@ const App: React.FC = () => {
   );
   const updateDialog = useCallback(
     (dialogId: string, content: string) => {
-      console.log(`Changing content to ${content}, dialogId: ${dialogId}`);
       setTranscription((t: Dialog[]) => {
         const updated: Dialog[] = [];
         for (const d of t) {
