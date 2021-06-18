@@ -16,7 +16,7 @@ export const makePostRequest = <T>(
 ): Promise<T> => {
   return Auth.currentSession().then((session) => {
     const jwtToken = session.getIdToken().getJwtToken();
-    return API.post("SAMAPI", path, {
+    return API.put("SAMAPI", path, {
       body: payload,
       headers: { Authorization: "Bearer " + jwtToken },
     });
