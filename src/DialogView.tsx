@@ -56,6 +56,10 @@ const Styles = styled.div`
   .content {
     padding: 5px;
     flex-grow: 1;
+
+    .form-control {
+      background-color: transparent !important;
+    }
   }
 `;
 
@@ -74,7 +78,7 @@ const DialogView: React.FC<Props> = ({
   color = "#fff",
   speakerOptions,
   onSetSpeaker,
-  updateDialog
+  updateDialog,
 }) => {
   const { speakers, setSpeakers } = useContext(SpeakersContext);
   const [editing, setEditing] = useState(false);
@@ -122,11 +126,20 @@ const DialogView: React.FC<Props> = ({
           </div>
         )}
       </div>
-      <Form.Control value={dialog ? dialog.words : partial} onChange={(e) => {
-        if(updateDialog && dialog) {
-          updateDialog(dialog.dialogId, e.target.value);
-        }
-      }} />
+      <div
+        className="content"
+        style={{ backgroundColor: _color.lighten(0.2).hex() }}
+        contentEditable={true}
+      >
+        <Form.Control
+          value={dialog ? dialog.words : partial}
+          onChange={(e) => {
+            if (updateDialog && dialog) {
+              updateDialog(dialog.dialogId, e.target.value);
+            }
+          }}
+        />
+      </div>
     </Styles>
   );
 };
