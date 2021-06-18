@@ -227,6 +227,17 @@ const App: React.FC = () => {
     [setTranscription]
   );
 
+  const handleDeleteDialog = useCallback(
+    (dialogId: string) => {
+      setTranscription((t) => {
+        const index = t.map(({ dialogId }) => dialogId).indexOf(dialogId);
+
+        return [...t.slice(0, index), ...t.slice(index + 1)];
+      });
+    },
+    [setTranscription]
+  );
+
   return (
     <AmplifyAuthenticator>
       {user && (
@@ -251,6 +262,7 @@ const App: React.FC = () => {
                       onSetSpeaker={handleSetSpeaker}
                       updateDialog={updateDialog}
                       onMergeUpDialog={i > 0 ? handleMergeUpDialog : undefined}
+                      onDeleteDialog={handleDeleteDialog}
                     />
                   ))}
                   {partial && (

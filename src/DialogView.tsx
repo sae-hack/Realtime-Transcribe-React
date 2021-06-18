@@ -1,10 +1,11 @@
 import {
   faClock,
   faLevelUpAlt,
+  faTrash,
   faUserAstronaut,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { BeatLoader } from "react-spinners";
 import styled from "styled-components";
 import { Dialog } from "./types";
@@ -72,6 +73,13 @@ const Styles = styled.div`
     .merge-up-button {
       position: absolute;
       bottom: 1px;
+      right: 52px;
+      cursor: pointer;
+    }
+
+    .delete-button {
+      position: absolute;
+      bottom: 1px;
       right: 32px;
       cursor: pointer;
     }
@@ -86,6 +94,7 @@ interface Props {
   onSetSpeaker: (dialog: Dialog, name: string) => void;
   updateDialog?: (diaglogId: string, dialog: string) => void;
   onMergeUpDialog?: (dialogId: string) => void;
+  onDeleteDialog?: (dialogId: string) => void;
 }
 
 const DialogView: React.FC<Props> = ({
@@ -96,6 +105,7 @@ const DialogView: React.FC<Props> = ({
   onSetSpeaker,
   updateDialog,
   onMergeUpDialog,
+  onDeleteDialog,
 }) => {
   const [editing, setEditing] = useState(false);
   const speakers = useSpeakers();
@@ -185,6 +195,14 @@ const DialogView: React.FC<Props> = ({
               <FontAwesomeIcon icon={faLevelUpAlt} />
             </div>
           </OverlayTrigger>
+        )}
+        {dialog && onDeleteDialog && (
+          <div
+            className="delete-button"
+            onClick={() => onDeleteDialog(dialog.dialogId)}
+          >
+            <FontAwesomeIcon icon={faTrash} />
+          </div>
         )}
       </div>
     </Styles>
