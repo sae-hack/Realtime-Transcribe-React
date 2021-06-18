@@ -1,6 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
-import { UserContext } from "./contexts";
-import { CognitoUser } from "amazon-cognito-identity-js";
+import { useCallback, useEffect, useState } from "react";
 import { Dialog } from "./types";
 import { v4 as uuidv4 } from "uuid";
 // import MicrophoneStream from "microphone-stream";
@@ -9,17 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 //   createPresignedUrl,
 // } from "../public/amazon-transcribe-websocket-static/main";
 // import { eventStreamMarshaller } from "../public/amazon-transcribe-websocket-static/marshaller";
-
-type CognitoUserTweaked = CognitoUser & {
-  username?: string;
-  attributes?: {
-    email: string;
-    email_verified: boolean;
-  };
-};
-
-export const useUser = (): CognitoUserTweaked | undefined =>
-  useContext(UserContext);
 
 export const useTranscribe = (credential: any, region: string, stop: any) => {
   const [transcription, setTranscription] = useState<Dialog[]>([]);

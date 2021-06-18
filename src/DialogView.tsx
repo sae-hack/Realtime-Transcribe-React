@@ -4,14 +4,14 @@ import {
   faUserAstronaut,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import styled from "styled-components";
-import { SpeakersContext } from "./contexts";
 import { Dialog } from "./types";
 import Color from "color";
-import { Dropdown, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Dropdown, OverlayTrigger, Tooltip } from "react-bootstrap";
 import EditableMarkdown from "./EditableMarkdown";
+import { useSpeakers } from "./redux";
 
 const Styles = styled.div`
   display: flex;
@@ -97,8 +97,8 @@ const DialogView: React.FC<Props> = ({
   updateDialog,
   onMergeUpDialog,
 }) => {
-  const { speakers, setSpeakers } = useContext(SpeakersContext);
   const [editing, setEditing] = useState(false);
+  const speakers = useSpeakers();
 
   const _color = Color(color);
 

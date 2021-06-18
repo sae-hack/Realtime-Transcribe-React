@@ -2,7 +2,7 @@ import { AmplifyButton } from "@aws-amplify/ui-react";
 import React, { useCallback, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
-import { useUser } from "./hooks";
+import { useUser } from "./redux";
 import { makeRequest } from "./utils";
 
 const Styles = styled.div`

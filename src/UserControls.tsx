@@ -1,7 +1,7 @@
 import { AmplifySignOut } from "@aws-amplify/ui-react";
 import React from "react";
 import styled from "styled-components";
-import { useUser } from "./hooks";
+import { useUser } from "./redux";
 
 const Styles = styled.div`
   height: 100%;

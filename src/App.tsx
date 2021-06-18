@@ -5,7 +5,6 @@ import { AmplifyAuthenticator } from "@aws-amplify/ui-react";
 import { AuthState, onAuthUIStateChange } from "@aws-amplify/ui-components";
 import { Container, Col, Row } from "react-bootstrap";
 import BottomBar from "./BottomBar";
-import { SpeakersContext, UserContext } from "./contexts";
 import { CognitoUser } from "amazon-cognito-identity-js";
 import { useTranscribe } from "./hooks";
 import DialogView from "./DialogView";
@@ -13,6 +12,7 @@ import distinctColors from "distinct-colors";
 import SpeakerList from "./SpeakerList";
 import { Dialog } from "./types";
 import { makeMarkdown, makePostRequest } from "./utils";
+import { ActionType, useAppDispatch, useSpeakers, useUser } from "./redux";
 
 const customSpeakerIds: number[] = [];
 const generateNewSpeakerId = (): number => {
@@ -35,17 +35,18 @@ const DEFAULT_COLORS = distinctColors({
 }).map((color) => color.hex());
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<CognitoUser | undefined>(undefined);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     return onAuthUIStateChange((nextAuthState, authData) => {
       if (nextAuthState === AuthState.SignedIn) {
-        setUser(authData as CognitoUser);
+        dispatch({ type: ActionType.SetUser, user: authData as CognitoUser });
       } else {
-        setUser(undefined);
+        dispatch({ type: ActionType.SetUser, user: undefined });
       }
     });
-  }, []);
+  }, [dispatch]);
+  const user = useUser();
 
   const [stop, setStop] = useState<any>();
 
@@ -55,19 +56,12 @@ const App: React.FC = () => {
     region,
     stop
   );
-  const [speakers, setSpeakers] = useState<Record<number, string>>({});
 
   const [unallocatedSpeakerNames, allocateSpeakerNames] = useState<string[]>(
     []
   );
 
-  const speakerContextValue = useMemo(
-    () => ({
-      speakers,
-      setSpeakers,
-    }),
-    [speakers]
-  );
+  const speakers = useSpeakers();
 
   const allSpeakers = [
     ...new Set(
@@ -116,9 +110,13 @@ const App: React.FC = () => {
         console.error("Cannot find speaker with existing name ", from);
       }
 
-      setSpeakers({ ...speakers, [Number(speakerId)]: to });
+      dispatch({
+        type: ActionType.OverrideSpeaker,
+        speakerId,
+        speakerName: to,
+      });
     },
-    [speakers, allSpeakers]
+    [speakers, allSpeakers, dispatch]
   );
 
   const handleCreateNewSpeaker = useCallback(
@@ -164,7 +162,11 @@ const App: React.FC = () => {
         }
         newId = speakerId as unknown as number;
       }
-      setSpeakers((s) => ({ ...s, [newId]: name }));
+      dispatch({
+        type: ActionType.OverrideSpeaker,
+        speakerId: newId,
+        speakerName: name,
+      });
       setTranscription((t: Dialog[]) => {
         const indexToReplace = t.indexOf(dialog);
         return [
@@ -174,7 +176,7 @@ const App: React.FC = () => {
         ];
       });
     },
-    [allSpeakers, setTranscription, speakers, unallocatedSpeakerNames]
+    [allSpeakers, setTranscription, speakers, unallocatedSpeakerNames, dispatch]
   );
 
   const handleSaveToQuip = useCallback(
@@ -213,60 +215,59 @@ const App: React.FC = () => {
     [setTranscription]
   );
 
-  const handleMergeUpDialog = useCallback((dialogId: string) => {
-    setTranscription((t) => {
-      const index = t.map(({ dialogId }) => dialogId).indexOf(dialogId);
+  const handleMergeUpDialog = useCallback(
+    (dialogId: string) => {
+      setTranscription((t) => {
+        const index = t.map(({ dialogId }) => dialogId).indexOf(dialogId);
 
-      const previousDialog = t[index - 1];
-      const dialog = t[index];
+        const previousDialog = t[index - 1];
+        const dialog = t[index];
 
-      const mergedDialog: Dialog = {
-        ...previousDialog,
-        endTime: dialog.endTime,
-        words: previousDialog.words + " " + dialog.words,
-      };
+        const mergedDialog: Dialog = {
+          ...previousDialog,
+          endTime: dialog.endTime,
+          words: previousDialog.words + " " + dialog.words,
+        };
 
-      return [...t.slice(0, index - 1), mergedDialog, ...t.slice(index + 1)];
-    });
-  }, []);
+        return [...t.slice(0, index - 1), mergedDialog, ...t.slice(index + 1)];
+      });
+    },
+    [setTranscription]
+  );
 
   return (
     <AmplifyAuthenticator>
       {user && (
-        <UserContext.Provider value={user}>
+        <div>
           <div>
             <Container fluid style={{ marginBottom: "5rem" }}>
               <Row>
                 <Col xs={9}>
                   <h3>Conversation</h3>
-                  <SpeakersContext.Provider value={speakerContextValue}>
-                    {transcription.map((dialog, i) => (
-                      <DialogView
-                        key={i}
-                        dialog={dialog}
-                        color={
-                          colors[
-                            allSpeakers.indexOf(
-                              speakers[dialog.speaker] || String(dialog.speaker)
-                            )
-                          ]
-                        }
-                        speakerOptions={speakerOptions}
-                        onSetSpeaker={handleSetSpeaker}
-                        updateDialog={updateDialog}
-                        onMergeUpDialog={
-                          i > 0 ? handleMergeUpDialog : undefined
-                        }
-                      />
-                    ))}
-                    {partial && (
-                      <DialogView
-                        partial={partial}
-                        speakerOptions={speakerOptions}
-                        onSetSpeaker={handleSetSpeaker}
-                      />
-                    )}
-                  </SpeakersContext.Provider>
+                  {transcription.map((dialog, i) => (
+                    <DialogView
+                      key={i}
+                      dialog={dialog}
+                      color={
+                        colors[
+                          allSpeakers.indexOf(
+                            speakers[dialog.speaker] || String(dialog.speaker)
+                          )
+                        ]
+                      }
+                      speakerOptions={speakerOptions}
+                      onSetSpeaker={handleSetSpeaker}
+                      updateDialog={updateDialog}
+                      onMergeUpDialog={i > 0 ? handleMergeUpDialog : undefined}
+                    />
+                  ))}
+                  {partial && (
+                    <DialogView
+                      partial={partial}
+                      speakerOptions={speakerOptions}
+                      onSetSpeaker={handleSetSpeaker}
+                    />
+                  )}
                 </Col>
                 <Col>
                   <SpeakerList
@@ -284,7 +285,7 @@ const App: React.FC = () => {
             saveToQuip={handleSaveToQuip}
             setStop={setStop}
           />
-        </UserContext.Provider>
+        </div>
       )}
     </AmplifyAuthenticator>
   );
