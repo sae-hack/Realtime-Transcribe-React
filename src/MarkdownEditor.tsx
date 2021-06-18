@@ -10,51 +10,53 @@ export interface MarkdownEditorProps {
   onChange: (newValue: string) => void;
 }
 
-const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange }) => {
-  const [plugins, InlineToolbar] = useMemo(() => {
-    const inlineToolbarPlugin = createInlineToolbarPlugin();
-    return [[inlineToolbarPlugin], inlineToolbarPlugin.InlineToolbar];
-  }, []);
+const MarkdownEditor: React.FC<MarkdownEditorProps & { onBlur: () => void }> =
+  ({ value, onChange, onBlur }) => {
+    const [plugins, InlineToolbar] = useMemo(() => {
+      const inlineToolbarPlugin = createInlineToolbarPlugin();
+      return [[inlineToolbarPlugin], inlineToolbarPlugin.InlineToolbar];
+    }, []);
 
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createWithContent(convertFromRaw(markdownToDraft(value)))
-  );
+    const [editorState, setEditorState] = useState(() =>
+      EditorState.createWithContent(convertFromRaw(markdownToDraft(value)))
+    );
 
-  const handleChange = useCallback(
-    (newState: EditorState) => {
-      setEditorState(newState);
+    const handleChange = useCallback(
+      (newState: EditorState) => {
+        setEditorState(newState);
 
-      const markdown = draftToMarkdown(
-        convertToRaw(newState.getCurrentContent()),
-        {
-          styleItems: {
-            UNDERLINE: {
-              open: function open() {
-                return "<u>";
-              },
+        const markdown = draftToMarkdown(
+          convertToRaw(newState.getCurrentContent()),
+          {
+            styleItems: {
+              UNDERLINE: {
+                open: function open() {
+                  return "<u>";
+                },
 
-              close: function close() {
-                return "</u>";
+                close: function close() {
+                  return "</u>";
+                },
               },
             },
-          },
-        }
-      );
-      onChange(markdown);
-    },
-    [onChange]
-  );
+          }
+        );
+        onChange(markdown);
+      },
+      [onChange]
+    );
 
-  return (
-    <div>
-      <Editor
-        editorState={editorState}
-        onChange={handleChange}
-        plugins={plugins}
-      />
-      <InlineToolbar />
-    </div>
-  );
-};
+    return (
+      <div>
+        <Editor
+          editorState={editorState}
+          onChange={handleChange}
+          onBlur={onBlur}
+          plugins={plugins}
+        />
+        <InlineToolbar />
+      </div>
+    );
+  };
 
 export default MarkdownEditor;

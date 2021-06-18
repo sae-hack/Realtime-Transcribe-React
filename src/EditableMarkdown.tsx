@@ -9,7 +9,11 @@ const EditableMarkdown: React.FC<MarkdownEditorProps> = ({
   const [editing, setEditing] = useState(false);
 
   return editing ? (
-    <MarkdownEditor value={value} onChange={onChange} />
+    <MarkdownEditor
+      value={value}
+      onChange={onChange}
+      onBlur={() => setEditing(false)}
+    />
   ) : (
     <span onClick={() => setEditing(true)}>
       <ReactMarkdown>{value}</ReactMarkdown>
