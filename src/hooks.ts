@@ -1,7 +1,8 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import UserContext from "./UserContext";
+import { UserContext } from "./contexts";
 import { CognitoUser } from "amazon-cognito-identity-js";
 import { Dialog } from "./types";
+import { v4 as uuidv4 } from 'uuid';
 // import MicrophoneStream from "microphone-stream";
 // import {
 //   convertAudioToBinaryMessage,
@@ -55,6 +56,7 @@ export const useTranscribe = (credential: any, region: string, stop: any) => {
 
               if (!lastDialog || type === "speaker-change") {
                 dialogsToAppend.push({
+                  dialogId: uuidv4(),
                   speaker,
                   words: text,
                   startTime,
@@ -96,6 +98,7 @@ export const useTranscribe = (credential: any, region: string, stop: any) => {
 
   return {
     transcription,
+    setTranscription,
     partial,
     error,
   };
