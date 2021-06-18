@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { UserContext } from "./contexts";
 import { CognitoUser } from "amazon-cognito-identity-js";
 import { Dialog } from "./types";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 // import MicrophoneStream from "microphone-stream";
 // import {
 //   convertAudioToBinaryMessage,
@@ -42,6 +42,7 @@ export const useTranscribe = (credential: any, region: string, stop: any) => {
           setPartial("");
           setTranscription((t: Dialog[]) => {
             const dialogsToAppend: Dialog[] = [];
+            let speakerChanged = false;
             for (const item of results[0].Alternatives[0].Items) {
               const speaker = item.Speaker;
               const text = item.Content;
@@ -49,12 +50,28 @@ export const useTranscribe = (credential: any, region: string, stop: any) => {
               const startTime = item.StartTime;
               const endTime = item.EndTime;
 
+              if (type === "speaker-change") {
+                speakerChanged = true;
+                continue;
+              }
+
               const lastDialog =
                 dialogsToAppend.length > 0
                   ? dialogsToAppend[dialogsToAppend.length - 1]
                   : undefined;
 
-              if (!lastDialog || type === "speaker-change") {
+              // when speaker id changes and there is no "speaker-change" event in between, manually do it.
+              // skip scenarios where either of speakers are undefined
+              if (
+                lastDialog &&
+                lastDialog.speaker !== undefined &&
+                speaker !== undefined &&
+                lastDialog.speaker !== speaker
+              ) {
+                speakerChanged = true;
+              }
+
+              if (!lastDialog || speakerChanged) {
                 dialogsToAppend.push({
                   dialogId: uuidv4(),
                   speaker,
@@ -73,6 +90,7 @@ export const useTranscribe = (credential: any, region: string, stop: any) => {
                   endTime,
                 });
               }
+              speakerChanged = false;
             }
             return [...t, ...dialogsToAppend];
           });
@@ -89,8 +107,7 @@ export const useTranscribe = (credential: any, region: string, stop: any) => {
       (window as any).secret_key = credential.SecretAccessKey;
       (window as any).session_token = credential.SessionToken;
       (window as any).startTranscribe();
-    }
-    else if (stop){
+    } else if (stop) {
       (window as any).closeSocket();
       console.log("stop button clicked");
     }
