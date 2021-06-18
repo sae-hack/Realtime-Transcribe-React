@@ -26,8 +26,6 @@ const generateNewSpeakerId = (): number => {
   }
 };
 
-const region = "us-west-2";
-
 const DEFAULT_SPEAKER_COUNT = 6; // if there are more speakers, we recreate the colors object
 const DEFAULT_COLORS = distinctColors({
   count: DEFAULT_SPEAKER_COUNT,
@@ -48,14 +46,8 @@ const App: React.FC = () => {
   }, [dispatch]);
   const user = useUser();
 
-  const [stop, setStop] = useState<any>();
-
-  const [credential, setCredential] = useState<any>();
-  const { transcription, setTranscription, partial, error } = useTranscribe(
-    credential,
-    region,
-    stop
-  );
+  const { transcription, setTranscription, partial, handleEventStreamMessage } =
+    useTranscribe();
 
   const [unallocatedSpeakerNames, allocateSpeakerNames] = useState<string[]>(
     []
@@ -281,9 +273,8 @@ const App: React.FC = () => {
             </Container>
           </div>
           <BottomBar
-            setCredential={setCredential}
+            onEventStreamMessage={handleEventStreamMessage}
             saveToQuip={handleSaveToQuip}
-            setStop={setStop}
           />
         </div>
       )}

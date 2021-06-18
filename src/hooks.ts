@@ -1,14 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Dialog } from "./types";
 import { v4 as uuidv4 } from "uuid";
-// import MicrophoneStream from "microphone-stream";
-// import {
-//   convertAudioToBinaryMessage,
-//   createPresignedUrl,
-// } from "../public/amazon-transcribe-websocket-static/main";
-// import { eventStreamMarshaller } from "../public/amazon-transcribe-websocket-static/marshaller";
 
-export const useTranscribe = (credential: any, region: string, stop: any) => {
+export const useTranscribe = () => {
   const [transcription, setTranscription] = useState<Dialog[]>([]);
   const [partial, setPartial] = useState<string>("");
   const [error, setError] = useState<string>();
@@ -86,23 +80,10 @@ export const useTranscribe = (credential: any, region: string, stop: any) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (credential && region && !stop) {
-      (window as any).handleEventStreamMessage = handleEventStreamMessage;
-      (window as any).region = region;
-      (window as any).access_id = credential.AccessKeyId;
-      (window as any).secret_key = credential.SecretAccessKey;
-      (window as any).session_token = credential.SessionToken;
-      (window as any).startTranscribe();
-    } else if (stop) {
-      (window as any).closeSocket();
-      console.log("stop button clicked");
-    }
-  }, [credential, region, handleEventStreamMessage, stop]);
-
   return {
     transcription,
     setTranscription,
+    handleEventStreamMessage,
     partial,
     error,
   };

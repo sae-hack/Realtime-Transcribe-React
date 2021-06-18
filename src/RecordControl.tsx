@@ -1,48 +1,54 @@
 import { AmplifyButton } from "@aws-amplify/ui-react";
-import React, { useCallback, useState } from "react";
-import { ClipLoader } from "react-spinners";
+import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useCallback } from "react";
+import { ClipLoader, ScaleLoader } from "react-spinners";
 import styled from "styled-components";
-import { useUser } from "./redux";
-import { makeRequest } from "./utils";
+import {
+  startSession,
+  stopSession,
+  useAppDispatch,
+  useAppSelector,
+  useUser,
+} from "./redux";
 
 const Styles = styled.div`
   display: flex;
   width: auto;
   align-items: center;
+
+  .status-icon {
+    padding-right: 5px;
+  }
 `;
 
 export interface RecordControlProps {
-  setCredential: (credential: any) => void;
-  setStop: (stop: any) => void;
   saveToQuip: (documentUrl: string) => void;
+  onEventStreamMessage: (messageJson: any) => void;
 }
 
 const RecordControl: React.FC<RecordControlProps> = ({
-  setCredential,
-  setStop,
+  onEventStreamMessage,
   saveToQuip,
 }) => {
   const user = useUser();
-  const [loading, setLoading] = useState(false);
 
+  const { fetchingCredential, recording } = useAppSelector(
+    (states) => states.session
+  );
+
+  const dispatch = useAppDispatch();
   const handleStartSession = useCallback(() => {
     if (user) {
-      setLoading(true);
-      setStop(false);
-      makeRequest("/start-session")
-        .then((data: any) => {
-          setCredential(data.credentials);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
+      dispatch(startSession("us-west-2", onEventStreamMessage));
     }
-  }, [user, setCredential]);
+  }, [dispatch, user, onEventStreamMessage]);
 
   const handleStopSession = useCallback(() => {
     if (user) {
-      setStop(true);
+      dispatch(stopSession());
     }
-  }, [user, setStop]);
+  }, [dispatch, user]);
 
   const handleSaveToQuip = useCallback(() => {
     const url = prompt("Quip document URL:");
@@ -53,15 +59,27 @@ const RecordControl: React.FC<RecordControlProps> = ({
 
   return (
     <Styles>
-      {loading && <ClipLoader color="white" size={20} />}
+      <div className="status-icon">
+        {fetchingCredential && <ClipLoader color="white" size={20} />}
+        {recording && <ScaleLoader color="white" height={20} />}
+      </div>
       <AmplifyButton disabled={!user} onClick={handleSaveToQuip}>
         Save to Quip
       </AmplifyButton>
-      <AmplifyButton disabled={!user} onClick={handleStartSession}>
-        Start
+      {/* somehow we cannot conditional render these buttons. The style will be off once we do that. Using style.display to control them */}
+      <AmplifyButton
+        disabled={!user}
+        onClick={handleStartSession}
+        style={{ display: recording ? "none" : "unset" }}
+      >
+        <FontAwesomeIcon icon={faPlay} />
       </AmplifyButton>
-      <AmplifyButton disabled={!user} onClick={handleStopSession}>
-        Stop
+      <AmplifyButton
+        disabled={!user}
+        onClick={handleStopSession}
+        style={{ display: recording ? "unset" : "none" }}
+      >
+        <FontAwesomeIcon icon={faStop} />
       </AmplifyButton>
     </Styles>
   );
