@@ -23,7 +23,7 @@ const Styles = styled.div`
 `;
 
 export interface RecordControlProps {
-  saveToQuip: (documentUrl: string) => void;
+  saveToQuip: (documentUrl: string, quipToken: string) => void;
   onEventStreamMessage: (messageJson: any) => void;
 }
 
@@ -51,9 +51,17 @@ const RecordControl: React.FC<RecordControlProps> = ({
   }, [dispatch, user]);
 
   const handleSaveToQuip = useCallback(() => {
-    const url = prompt("Quip document URL:");
-    if (url) {
-      saveToQuip(url);
+    const savedToken = localStorage.getItem("quip-token") || "";
+    const quipToken = prompt(
+      "Quip Token (get one from https://quip-amazon.com/dev/token):",
+      savedToken
+    );
+    if (quipToken) {
+      localStorage.setItem("quip-token", quipToken);
+      const url = prompt("Quip document URL:");
+      if (url) {
+        saveToQuip(url, quipToken);
+      }
     }
   }, [saveToQuip]);
 

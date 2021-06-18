@@ -172,12 +172,13 @@ const App: React.FC = () => {
   );
 
   const handleSaveToQuip = useCallback(
-    (documentUrl: string) => {
+    (documentUrl: string, quipToken: string) => {
       const markdown = makeMarkdown(transcription, speakers);
 
       makePostRequest("/putDocument", {
         content: markdown,
         documentUrl,
+        quipToken,
       })
         .then(() => {
           window.open(documentUrl);
