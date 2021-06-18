@@ -47,7 +47,6 @@ const App: React.FC = () => {
     });
   }, []);
 
-
   const [stop, setStop] = useState<any>();
 
   const [credential, setCredential] = useState<any>();
@@ -193,24 +192,27 @@ const App: React.FC = () => {
     },
     [transcription, speakers]
   );
-  const updateDialog = useCallback((dialogId: string, content: string) => {
-    console.log(`Changing content to ${content}, dialogId: ${dialogId}`);
-    setTranscription((t: Dialog[]) => {
-      const updated: Dialog[] = [];
-      for (const d of t) {
-        if (d.dialogId !== dialogId) {
-          updated.push(d);
-          continue;
+  const updateDialog = useCallback(
+    (dialogId: string, content: string) => {
+      console.log(`Changing content to ${content}, dialogId: ${dialogId}`);
+      setTranscription((t: Dialog[]) => {
+        const updated: Dialog[] = [];
+        for (const d of t) {
+          if (d.dialogId !== dialogId) {
+            updated.push(d);
+            continue;
+          }
+          const nd = {
+            ...d,
+            words: content,
+          };
+          updated.push(nd);
         }
-        const nd = {
-          ...d,
-          words: content,
-        };
-        updated.push(nd);
-      }
-      return updated;
-    });
-  }, [setTranscription]);
+        return updated;
+      });
+    },
+    [setTranscription]
+  );
 
   return (
     <AmplifyAuthenticator>
@@ -220,6 +222,7 @@ const App: React.FC = () => {
             <Container fluid style={{ marginBottom: "5rem" }}>
               <Row>
                 <Col xs={9}>
+                  <h3>Conversation</h3>
                   <SpeakersContext.Provider value={speakerContextValue}>
                     {transcription.map((dialog, i) => (
                       <DialogView

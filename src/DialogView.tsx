@@ -7,6 +7,7 @@ import { SpeakersContext } from "./contexts";
 import { Dialog } from "./types";
 import Color from "color";
 import { Dropdown, Form } from "react-bootstrap";
+import EditableMarkdown from "./EditableMarkdown";
 
 const Styles = styled.div`
   display: flex;
@@ -129,16 +130,18 @@ const DialogView: React.FC<Props> = ({
       <div
         className="content"
         style={{ backgroundColor: _color.lighten(0.2).hex() }}
-        contentEditable={true}
       >
-        <Form.Control
-          value={dialog ? dialog.words : partial}
-          onChange={(e) => {
-            if (updateDialog && dialog) {
-              updateDialog(dialog.dialogId, e.target.value);
-            }
-          }}
-        />
+        {dialog && (
+          <EditableMarkdown
+            value={dialog.words}
+            onChange={(newValue) => {
+              if (updateDialog && dialog) {
+                updateDialog(dialog.dialogId, newValue);
+              }
+            }}
+          />
+        )}
+        {partial && <span>{partial}</span>}
         {dialog && (
           <div className="timestamp">
             <FontAwesomeIcon icon={faClock} /> {dialog.startTime.toFixed(2)}s
