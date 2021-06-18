@@ -1,4 +1,8 @@
-import { faClock, faUserAstronaut } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClock,
+  faLevelUpAlt,
+  faUserAstronaut,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
@@ -6,7 +10,7 @@ import styled from "styled-components";
 import { SpeakersContext } from "./contexts";
 import { Dialog } from "./types";
 import Color from "color";
-import { Dropdown, Form } from "react-bootstrap";
+import { Dropdown, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import EditableMarkdown from "./EditableMarkdown";
 
 const Styles = styled.div`
@@ -64,6 +68,13 @@ const Styles = styled.div`
       bottom: 5px;
       left: 10px;
     }
+
+    .merge-up-button {
+      position: absolute;
+      bottom: 1px;
+      right: 32px;
+      cursor: pointer;
+    }
   }
 `;
 
@@ -74,6 +85,7 @@ interface Props {
   speakerOptions: string[];
   onSetSpeaker: (dialog: Dialog, name: string) => void;
   updateDialog?: (diaglogId: string, dialog: string) => void;
+  onMergeUpDialog?: (dialogId: string) => void;
 }
 
 const DialogView: React.FC<Props> = ({
@@ -83,6 +95,7 @@ const DialogView: React.FC<Props> = ({
   speakerOptions,
   onSetSpeaker,
   updateDialog,
+  onMergeUpDialog,
 }) => {
   const { speakers, setSpeakers } = useContext(SpeakersContext);
   const [editing, setEditing] = useState(false);
@@ -103,7 +116,16 @@ const DialogView: React.FC<Props> = ({
               </div>
               <div className="speaker-label" onClick={() => setEditing(true)}>
                 <Dropdown>
-                  <Dropdown.Toggle>{speakerName}</Dropdown.Toggle>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id="edit-dialog-speaker-tooltip">
+                        Select the speaker for this bubble
+                      </Tooltip>
+                    }
+                  >
+                    <Dropdown.Toggle>{speakerName}</Dropdown.Toggle>
+                  </OverlayTrigger>
 
                   <Dropdown.Menu show={editing}>
                     {speakerOptions.map((name) => (
@@ -146,6 +168,23 @@ const DialogView: React.FC<Props> = ({
           <div className="timestamp">
             <FontAwesomeIcon icon={faClock} /> {dialog.startTime.toFixed(2)}s
           </div>
+        )}
+        {dialog && onMergeUpDialog && (
+          <OverlayTrigger
+            placement="top"
+            overlay={
+              <Tooltip id="merge-up-tooltip">
+                Merge this into the previous bubble
+              </Tooltip>
+            }
+          >
+            <div
+              className="merge-up-button"
+              onClick={() => onMergeUpDialog(dialog.dialogId)}
+            >
+              <FontAwesomeIcon icon={faLevelUpAlt} />
+            </div>
+          </OverlayTrigger>
         )}
       </div>
     </Styles>

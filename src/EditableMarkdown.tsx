@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const EditorContainer = styled.div`
   padding-bottom: 10px;
@@ -39,7 +40,16 @@ const EditableMarkdown: React.FC<MarkdownEditorProps> = ({
       <span>
         <ReactMarkdown>{value}</ReactMarkdown>
       </span>
-      <FontAwesomeIcon icon={faEdit} />
+      <OverlayTrigger
+        placement="top"
+        overlay={
+          <Tooltip id="edit-tooltip">
+            Click the text to edit, highlight text to style it.
+          </Tooltip>
+        }
+      >
+        <FontAwesomeIcon icon={faEdit} />
+      </OverlayTrigger>
     </SpanContainer>
   );
 };

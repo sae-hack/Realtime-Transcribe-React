@@ -213,6 +213,23 @@ const App: React.FC = () => {
     [setTranscription]
   );
 
+  const handleMergeUpDialog = useCallback((dialogId: string) => {
+    setTranscription((t) => {
+      const index = t.map(({ dialogId }) => dialogId).indexOf(dialogId);
+
+      const previousDialog = t[index - 1];
+      const dialog = t[index];
+
+      const mergedDialog: Dialog = {
+        ...previousDialog,
+        endTime: dialog.endTime,
+        words: previousDialog.words + " " + dialog.words,
+      };
+
+      return [...t.slice(0, index - 1), mergedDialog, ...t.slice(index + 1)];
+    });
+  }, []);
+
   return (
     <AmplifyAuthenticator>
       {user && (
@@ -237,6 +254,9 @@ const App: React.FC = () => {
                         speakerOptions={speakerOptions}
                         onSetSpeaker={handleSetSpeaker}
                         updateDialog={updateDialog}
+                        onMergeUpDialog={
+                          i > 0 ? handleMergeUpDialog : undefined
+                        }
                       />
                     ))}
                     {partial && (
