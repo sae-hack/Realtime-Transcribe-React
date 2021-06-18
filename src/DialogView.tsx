@@ -7,7 +7,6 @@ import { SpeakersContext } from "./contexts";
 import { Dialog } from "./types";
 import Color from "color";
 import { Dropdown, Form } from "react-bootstrap";
-import { propTypes } from "react-bootstrap/esm/Image";
 
 const Styles = styled.div`
   display: flex;
@@ -18,17 +17,12 @@ const Styles = styled.div`
   .meta {
     flex-shrink: 0;
     width: 120px;
-    padding: 5px;
     position: relative;
     text-align: center;
     min-height: 50px;
 
     .speaking {
       margin-top: 5px;
-    }
-
-    .timestamp {
-      font-size: 0.8rem;
     }
 
     .speaker {
@@ -42,6 +36,7 @@ const Styles = styled.div`
       .speaker-label {
         font-weight: bold;
         cursor: pointer;
+        font-size: 1rem;
 
         .btn {
           /* erase the styles brought by react-bootstrap */
@@ -56,9 +51,17 @@ const Styles = styled.div`
   .content {
     padding: 5px;
     flex-grow: 1;
+    position: relative;
 
     .form-control {
       background-color: transparent !important;
+    }
+
+    .timestamp {
+      position: absolute;
+      font-size: 0.6rem;
+      bottom: 5px;
+      left: 10px;
     }
   }
 `;
@@ -115,9 +118,6 @@ const DialogView: React.FC<Props> = ({
                 </Dropdown>
               </div>
             </div>
-            <div className="timestamp">
-              <FontAwesomeIcon icon={faClock} /> {dialog.startTime.toFixed(2)}s
-            </div>
           </>
         )}
         {partial && (
@@ -139,6 +139,11 @@ const DialogView: React.FC<Props> = ({
             }
           }}
         />
+        {dialog && (
+          <div className="timestamp">
+            <FontAwesomeIcon icon={faClock} /> {dialog.startTime.toFixed(2)}s
+          </div>
+        )}
       </div>
     </Styles>
   );
